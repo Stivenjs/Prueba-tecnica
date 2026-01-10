@@ -151,3 +151,4 @@ Desarrollado como prueba técnica para Atlantic QI
 
 Este proyecto fue desarrollado siguiendo las mejores prácticas de desarrollo y arquitectura de software, con énfasis en código limpio, mantenible y escalable.
 # Prueba-tecnica
+# Prueba-tecnica
