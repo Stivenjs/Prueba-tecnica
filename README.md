@@ -1,12 +1,12 @@
-# 🏥 Sistema de Gestión de Asegurados - SEGUROS ABC
+# Sistema de Gestión de Asegurados - SEGUROS ABC
 
 Prueba técnica para Atlantic QI - Sistema de registro y gestión de información de potenciales asegurados.
 
-## 📋 Descripción
+## Descripción
 
 Sistema full-stack que permite capturar, gestionar y consultar información de potenciales asegurados para SEGUROS ABC. Desarrollado con .NET Core para el backend y Angular para el frontend.
 
-## 🛠️ Tecnologías Utilizadas
+## Tecnologías Utilizadas
 
 ### Backend
 - **.NET Core 10.0** - Framework para la API RESTful
@@ -19,7 +19,7 @@ Sistema full-stack que permite capturar, gestionar y consultar información de p
 - **TypeScript** - Lenguaje de programación
 - **CSS** - Estilos
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 Prueba-Tecnica/
@@ -37,7 +37,7 @@ Prueba-Tecnica/
 └── README.md
 ```
 
-## 🚀 Instalación y Configuración
+## Instalación y Configuración
 
 ### Prerrequisitos
 - .NET SDK 8.0 o superior
@@ -90,7 +90,7 @@ ng serve
 
 La aplicación estará disponible en `http://localhost:4200`
 
-## 📡 Endpoints de la API
+## Endpoints de la API
 
 ### Asegurados
 
@@ -101,7 +101,7 @@ La aplicación estará disponible en `http://localhost:4200`
 - `DELETE /api/asegurados/{id}` - Eliminar un asegurado
 - `GET /api/asegurados/buscar/{numeroIdentificacion}` - Buscar por número de identificación
 
-## 📊 Modelo de Datos
+## Modelo de Datos
 
 ### Asegurado
 - **Número de identificación** (long, PK, requerido)
@@ -115,7 +115,7 @@ La aplicación estará disponible en `http://localhost:4200`
 - **Valor estimado de solicitud del seguro** (decimal, requerido)
 - **Observaciones** (string, opcional)
 
-## ✅ Funcionalidades Implementadas
+## Funcionalidades Implementadas
 
 ### Backend
 - [x] Modelo de datos completo
@@ -134,7 +134,7 @@ La aplicación estará disponible en `http://localhost:4200`
 - [x] Interfaz moderna y responsiva
 - [x] Manejo de errores
 
-## 🔄 Control de Versiones (GitFlow)
+## Control de Versiones (GitFlow)
 
 Este proyecto sigue el estándar GitFlow:
 
@@ -143,12 +143,7 @@ Este proyecto sigue el estándar GitFlow:
 - `feature/*` - Ramas para nuevas funcionalidades
 - `hotfix/*` - Ramas para correcciones urgentes
 
-## 👨‍💻 Autor
+## Autor
 
 Desarrollado como prueba técnica para Atlantic QI
 
-## 📝 Notas
-
-Este proyecto fue desarrollado siguiendo las mejores prácticas de desarrollo y arquitectura de software, con énfasis en código limpio, mantenible y escalable.
-# Prueba-tecnica
-# Prueba-tecnica
