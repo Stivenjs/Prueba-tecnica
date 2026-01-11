@@ -1,9 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { AseguradoFormComponent } from '../../components/asegurado-form/asegurado-form';
-import { AseguradosService } from '../../../../core/services/asegurados.service';
-import { CreateAseguradoDto } from '../../../../shared/models/asegurado.model';
+import { AseguradoFormComponent } from '@features/asegurados/components/asegurado-form/asegurado-form';
+import { AseguradosService } from '@core/services/asegurados.service';
+import { CreateAseguradoDto } from '@shared/models/asegurado.model';
 
 @Component({
   selector: 'app-asegurado-create-page',

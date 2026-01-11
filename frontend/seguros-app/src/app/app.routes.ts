@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
-import { AseguradosPageComponent } from './features/asegurados/pages/asegurados-page/asegurados-page';
-import { AseguradoCreatePageComponent } from './features/asegurados/pages/asegurado-create-page/asegurado-create-page';
-import { AseguradoEditPageComponent } from './features/asegurados/pages/asegurado-edit-page/asegurado-edit-page';
+import { AseguradosPageComponent } from '@features/asegurados/pages/asegurados-page/asegurados-page';
+import { AseguradoCreatePageComponent } from '@features/asegurados/pages/asegurado-create-page/asegurado-create-page';
+import { AseguradoEditPageComponent } from '@features/asegurados/pages/asegurado-edit-page/asegurado-edit-page';
 
 export const routes: Routes = [
   {

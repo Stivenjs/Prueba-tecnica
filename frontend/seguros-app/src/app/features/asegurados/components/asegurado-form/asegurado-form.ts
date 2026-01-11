@@ -13,7 +13,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { Asegurado, CreateAseguradoDto } from '../../../../shared/models/asegurado.model';
+import { Asegurado, CreateAseguradoDto } from '@shared/models/asegurado.model';
 
 /**
  * Componente de formulario para crear/editar asegurados

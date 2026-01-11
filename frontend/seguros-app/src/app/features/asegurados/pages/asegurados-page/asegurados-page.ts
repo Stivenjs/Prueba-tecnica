@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { AseguradosListComponent } from '../../components/asegurados-list/asegurados-list';
+import { AseguradosListComponent } from '@features/asegurados/components/asegurados-list/asegurados-list';
 
 @Component({
   selector: 'app-asegurados-page',

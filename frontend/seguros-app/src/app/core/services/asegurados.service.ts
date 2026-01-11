@@ -6,7 +6,7 @@ import {
   AseguradosResponse, 
   CreateAseguradoDto, 
   UpdateAseguradoDto 
-} from '../../shared/models/asegurado.model';
+} from '@shared/models/asegurado.model';
 
 /**
  * Servicio para gestionar las operaciones CRUD de Asegurados

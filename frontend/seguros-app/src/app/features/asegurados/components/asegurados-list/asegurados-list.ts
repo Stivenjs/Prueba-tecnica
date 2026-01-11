@@ -13,8 +13,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { AseguradosService } from '../../../../core/services/asegurados.service';
-import { Asegurado } from '../../../../shared/models/asegurado.model';
+import { AseguradosService } from '@core/services/asegurados.service';
+import { Asegurado } from '@shared/models/asegurado.model';
 
 /**
  * Componente de lista/tabla de asegurados

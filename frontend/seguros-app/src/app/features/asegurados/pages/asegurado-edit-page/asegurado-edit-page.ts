@@ -3,9 +3,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CommonModule } from '@angular/common';
-import { AseguradoFormComponent } from '../../components/asegurado-form/asegurado-form';
-import { AseguradosService } from '../../../../core/services/asegurados.service';
-import { Asegurado, UpdateAseguradoDto } from '../../../../shared/models/asegurado.model';
+import { AseguradoFormComponent } from '@features/asegurados/components/asegurado-form/asegurado-form';
+import { AseguradosService } from '@core/services/asegurados.service';
+import { Asegurado, UpdateAseguradoDto } from '@shared/models/asegurado.model';
 
 @Component({
   selector: 'app-asegurado-edit-page',
