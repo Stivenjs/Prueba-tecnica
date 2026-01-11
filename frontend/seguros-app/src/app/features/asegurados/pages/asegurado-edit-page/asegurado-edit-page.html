@@ -1,0 +1,14 @@
+<div class="page-container">
+  <div *ngIf="isLoadingData" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Cargando datos...</p>
+  </div>
+
+  <app-asegurado-form
+    *ngIf="!isLoadingData && asegurado"
+    [asegurado]="asegurado"
+    [isLoading]="isLoading"
+    (submitForm)="onSubmit($event)"
+    (cancelForm)="onCancel()">
+  </app-asegurado-form>
+</div>
