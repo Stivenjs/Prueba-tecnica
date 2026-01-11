@@ -12,7 +12,8 @@
             <mat-label>Buscar por Número de Identificación</mat-label>
             <input 
               matInput 
-              [(ngModel)]="searchTerm"
+              [ngModel]="searchTerm()"
+              (ngModelChange)="searchTerm.set($event)"
               (keyup.enter)="onSearch()"
               placeholder="Ingrese número de identificación...">
             <button 
@@ -23,7 +24,7 @@
               <mat-icon>search</mat-icon>
             </button>
             <button 
-              *ngIf="searchTerm" 
+              *ngIf="searchTerm()" 
               mat-icon-button 
               matSuffix 
               (click)="clearSearch()"
@@ -44,13 +45,13 @@
       </div>
 
       <!-- Spinner de carga -->
-      <div *ngIf="isLoading" class="loading-container">
+      <div *ngIf="isLoading()" class="loading-container">
         <mat-spinner></mat-spinner>
       </div>
 
       <!-- Tabla de asegurados -->
-      <div *ngIf="!isLoading" class="table-container">
-        <table mat-table [dataSource]="asegurados" class="mat-elevation-z2">
+      <div *ngIf="!isLoading()" class="table-container">
+        <table mat-table [dataSource]="asegurados()" class="mat-elevation-z2">
           
           <!-- Columna: Número de Identificación -->
           <ng-container matColumnDef="numeroIdentificacion">
@@ -137,10 +138,10 @@
 
         <!-- Paginador -->
         <mat-paginator
-          [length]="totalRecords"
-          [pageSize]="pageSize"
+          [length]="totalRecords()"
+          [pageSize]="pageSize()"
           [pageSizeOptions]="pageSizeOptions"
-          [pageIndex]="currentPage - 1"
+          [pageIndex]="currentPage() - 1"
           (page)="onPageChange($event)"
           showFirstLastButtons>
         </mat-paginator>

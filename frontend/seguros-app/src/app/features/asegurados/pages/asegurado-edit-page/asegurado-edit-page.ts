@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -25,9 +25,9 @@ export class AseguradoEditPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly snackBar = inject(MatSnackBar);
 
-  asegurado?: Asegurado;
-  isLoading = false;
-  isLoadingData = true;
+  asegurado = signal<Asegurado | undefined>(undefined);
+  isLoading = signal(false);
+  isLoadingData = signal(true);
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -40,12 +40,12 @@ export class AseguradoEditPageComponent implements OnInit {
   }
 
   private loadAsegurado(id: number): void {
-    this.isLoadingData = true;
+    this.isLoadingData.set(true);
     
     this.aseguradosService.getAseguradoById(id).subscribe({
       next: (asegurado) => {
-        this.asegurado = asegurado;
-        this.isLoadingData = false;
+        this.asegurado.set(asegurado);
+        this.isLoadingData.set(false);
       },
       error: (error) => {
         console.error('Error al cargar asegurado:', error);
@@ -56,11 +56,12 @@ export class AseguradoEditPageComponent implements OnInit {
   }
 
   onSubmit(aseguradoData: UpdateAseguradoDto): void {
-    if (!this.asegurado) return;
+    const currentAsegurado = this.asegurado();
+    if (!currentAsegurado) return;
 
-    this.isLoading = true;
+    this.isLoading.set(true);
     
-    this.aseguradosService.updateAsegurado(this.asegurado.numeroIdentificacion, aseguradoData)
+    this.aseguradosService.updateAsegurado(currentAsegurado.numeroIdentificacion, aseguradoData)
       .subscribe({
         next: () => {
           this.showMessage('Asegurado actualizado exitosamente', 'success');
@@ -70,7 +71,7 @@ export class AseguradoEditPageComponent implements OnInit {
           console.error('Error al actualizar asegurado:', error);
           const mensaje = error.error?.message || 'Error al actualizar asegurado';
           this.showMessage(mensaje, 'error');
-          this.isLoading = false;
+          this.isLoading.set(false);
         }
       });
   }

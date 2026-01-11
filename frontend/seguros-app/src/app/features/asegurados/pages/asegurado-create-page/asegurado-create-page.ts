@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AseguradoFormComponent } from '@features/asegurados/components/asegurado-form/asegurado-form';
@@ -17,10 +17,10 @@ export class AseguradoCreatePageComponent {
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
 
-  isLoading = false;
+  isLoading = signal(false);
 
   onSubmit(asegurado: CreateAseguradoDto): void {
-    this.isLoading = true;
+    this.isLoading.set(true);
     
     this.aseguradosService.createAsegurado(asegurado).subscribe({
       next: () => {
@@ -31,7 +31,7 @@ export class AseguradoCreatePageComponent {
         console.error('Error al crear asegurado:', error);
         const mensaje = error.error?.message || 'Error al crear asegurado';
         this.showMessage(mensaje, 'error');
-        this.isLoading = false;
+        this.isLoading.set(false);
       }
     });
   }

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -57,14 +57,15 @@ export class AseguradosListComponent implements OnInit {
     'acciones'
   ];
 
-  asegurados: Asegurado[] = [];
-  isLoading = false;
-  searchTerm = '';
+  // Usando Signals para reactividad automática
+  asegurados = signal<Asegurado[]>([]);
+  isLoading = signal(false);
+  searchTerm = signal('');
   
   // Paginación
-  totalRecords = 0;
-  pageSize = 10;
-  currentPage = 1;
+  totalRecords = signal(0);
+  pageSize = signal(10);
+  currentPage = signal(1);
   pageSizeOptions = [5, 10, 20, 50];
 
   ngOnInit(): void {
@@ -75,18 +76,18 @@ export class AseguradosListComponent implements OnInit {
    * Cargar asegurados con paginación
    */
   loadAsegurados(): void {
-    this.isLoading = true;
-    this.aseguradosService.getAsegurados(this.currentPage, this.pageSize)
+    this.isLoading.set(true);
+    this.aseguradosService.getAsegurados(this.currentPage(), this.pageSize())
       .subscribe({
         next: (response) => {
-          this.asegurados = response.data;
-          this.totalRecords = response.totalRecords;
-          this.isLoading = false;
+          this.asegurados.set(response.data);
+          this.totalRecords.set(response.totalRecords);
+          this.isLoading.set(false);
         },
         error: (error) => {
           console.error('Error al cargar asegurados:', error);
           this.showMessage('Error al cargar asegurados', 'error');
-          this.isLoading = false;
+          this.isLoading.set(false);
         }
       });
   }
@@ -95,18 +96,18 @@ export class AseguradosListComponent implements OnInit {
    * Buscar asegurados por número de identificación
    */
   onSearch(): void {
-    if (!this.searchTerm || this.searchTerm.trim() === '') {
+    if (!this.searchTerm() || this.searchTerm().trim() === '') {
       this.loadAsegurados();
       return;
     }
 
-    this.isLoading = true;
-    this.aseguradosService.buscarPorIdentificacion(this.searchTerm)
+    this.isLoading.set(true);
+    this.aseguradosService.buscarPorIdentificacion(this.searchTerm())
       .subscribe({
         next: (asegurados) => {
-          this.asegurados = asegurados;
-          this.totalRecords = asegurados.length;
-          this.isLoading = false;
+          this.asegurados.set(asegurados);
+          this.totalRecords.set(asegurados.length);
+          this.isLoading.set(false);
           
           if (asegurados.length === 0) {
             this.showMessage('No se encontraron resultados', 'info');
@@ -115,7 +116,7 @@ export class AseguradosListComponent implements OnInit {
         error: (error) => {
           console.error('Error en la búsqueda:', error);
           this.showMessage('Error en la búsqueda', 'error');
-          this.isLoading = false;
+          this.isLoading.set(false);
         }
       });
   }
@@ -124,8 +125,8 @@ export class AseguradosListComponent implements OnInit {
    * Limpiar búsqueda
    */
   clearSearch(): void {
-    this.searchTerm = '';
-    this.currentPage = 1;
+    this.searchTerm.set('');
+    this.currentPage.set(1);
     this.loadAsegurados();
   }
 
@@ -133,8 +134,8 @@ export class AseguradosListComponent implements OnInit {
    * Manejar cambio de página
    */
   onPageChange(event: PageEvent): void {
-    this.currentPage = event.pageIndex + 1;
-    this.pageSize = event.pageSize;
+    this.currentPage.set(event.pageIndex + 1);
+    this.pageSize.set(event.pageSize);
     this.loadAsegurados();
   }
 
@@ -162,7 +163,7 @@ export class AseguradosListComponent implements OnInit {
 
     if (!confirmacion) return;
 
-    this.isLoading = true;
+    this.isLoading.set(true);
     this.aseguradosService.deleteAsegurado(asegurado.numeroIdentificacion)
       .subscribe({
         next: () => {
@@ -172,7 +173,7 @@ export class AseguradosListComponent implements OnInit {
         error: (error) => {
           console.error('Error al eliminar asegurado:', error);
           this.showMessage('Error al eliminar asegurado', 'error');
-          this.isLoading = false;
+          this.isLoading.set(false);
         }
       });
   }
