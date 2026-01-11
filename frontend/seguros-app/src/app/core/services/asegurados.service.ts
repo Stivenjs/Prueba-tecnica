@@ -5,7 +5,8 @@ import {
   Asegurado, 
   AseguradosResponse, 
   CreateAseguradoDto, 
-  UpdateAseguradoDto 
+  UpdateAseguradoDto,
+  SearchResponse 
 } from '@shared/models/asegurado.model';
 
 /**
@@ -45,10 +46,10 @@ export class AseguradosService {
   /**
    * Buscar asegurados por número de identificación (búsqueda parcial)
    * @param numeroIdentificacion Número de identificación a buscar
-   * @returns Observable con la lista de asegurados encontrados
+   * @returns Observable con el resultado de la búsqueda y metadata
    */
-  buscarPorIdentificacion(numeroIdentificacion: string): Observable<Asegurado[]> {
-    return this.http.get<Asegurado[]>(`${this.apiUrl}/buscar/${numeroIdentificacion}`);
+  buscarPorIdentificacion(numeroIdentificacion: string): Observable<SearchResponse> {
+    return this.http.get<SearchResponse>(`${this.apiUrl}/buscar/${numeroIdentificacion}`);
   }
 
   /**

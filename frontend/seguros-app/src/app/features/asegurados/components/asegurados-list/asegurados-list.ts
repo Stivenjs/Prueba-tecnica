@@ -104,13 +104,15 @@ export class AseguradosListComponent implements OnInit {
     this.isLoading.set(true);
     this.aseguradosService.buscarPorIdentificacion(this.searchTerm())
       .subscribe({
-        next: (asegurados) => {
-          this.asegurados.set(asegurados);
-          this.totalRecords.set(asegurados.length);
+        next: (response) => {
+          this.asegurados.set(response.results);
+          this.totalRecords.set(response.totalCount);
           this.isLoading.set(false);
           
-          if (asegurados.length === 0) {
-            this.showMessage('No se encontraron resultados', 'info');
+          // Mostrar mensaje informativo del backend
+          if (response.message) {
+            const type = response.totalCount === 0 ? 'info' : 'success';
+            this.showMessage(response.message, type);
           }
         },
         error: (error) => {

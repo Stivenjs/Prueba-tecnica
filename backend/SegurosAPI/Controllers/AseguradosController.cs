@@ -1,19 +1,24 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using SegurosAPI.Data;
-using SegurosAPI.Models;
+using SegurosAPI.DTOs.Requests;
+using SegurosAPI.Services.Interfaces;
 
 namespace SegurosAPI.Controllers
 {
+    /// <summary>
+    /// Controlador de Asegurados
+    /// Maneja solo peticiones HTTP, delega lógica de negocio al servicio
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class AseguradosController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IAseguradoService _service;
+        private readonly ILogger<AseguradosController> _logger;
 
-        public AseguradosController(ApplicationDbContext context)
+        public AseguradosController(IAseguradoService service, ILogger<AseguradosController> logger)
         {
-            _context = context;
+            _service = service;
+            _logger = logger;
         }
 
         /// <summary>
@@ -23,33 +28,14 @@ namespace SegurosAPI.Controllers
         /// <param name="pageSize">Tamaño de página (por defecto 10)</param>
         /// <returns>Lista paginada de asegurados</returns>
         [HttpGet]
-        public async Task<ActionResult<object>> GetAsegurados(
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetAsegurados(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10)
         {
-            if (pageNumber < 1) pageNumber = 1;
-            if (pageSize < 1) pageSize = 10;
-            if (pageSize > 100) pageSize = 100; // Límite máximo
-
-            var totalRecords = await _context.Asegurados.CountAsync();
-            var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
-
-            var asegurados = await _context.Asegurados
-                .OrderBy(a => a.NumeroIdentificacion)
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            var response = new
-            {
-                TotalRecords = totalRecords,
-                TotalPages = totalPages,
-                CurrentPage = pageNumber,
-                PageSize = pageSize,
-                Data = asegurados
-            };
-
-            return Ok(response);
+            var result = await _service.GetAllAsync(pageNumber, pageSize);
+            return Ok(result);
         }
 
         /// <summary>
@@ -58,165 +44,79 @@ namespace SegurosAPI.Controllers
         /// <param name="id">Número de identificación del asegurado</param>
         /// <returns>Datos del asegurado</returns>
         [HttpGet("{id}")]
-        public async Task<ActionResult<Asegurado>> GetAsegurado(long id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetAsegurado(long id)
         {
-            var asegurado = await _context.Asegurados.FindAsync(id);
-
-            if (asegurado == null)
-            {
-                return NotFound(new { message = $"No se encontró un asegurado con el número de identificación {id}" });
-            }
-
-            return Ok(asegurado);
+            var result = await _service.GetByIdAsync(id);
+            return Ok(result);
         }
 
         /// <summary>
         /// Buscar asegurados por número de identificación (búsqueda parcial)
         /// </summary>
         /// <param name="numeroIdentificacion">Número de identificación a buscar</param>
-        /// <returns>Lista de asegurados que coinciden con la búsqueda</returns>
+        /// <returns>Resultado de la búsqueda con metadata</returns>
+        /// <remarks>
+        /// Devuelve un objeto con:
+        /// - results: Array de asegurados encontrados
+        /// - totalCount: Número total de resultados
+        /// - searchTerm: Término de búsqueda usado
+        /// - message: Mensaje informativo sobre el resultado
+        /// </remarks>
         [HttpGet("buscar/{numeroIdentificacion}")]
-        public async Task<ActionResult<IEnumerable<Asegurado>>> BuscarPorIdentificacion(string numeroIdentificacion)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> BuscarPorIdentificacion(string numeroIdentificacion)
         {
-            if (string.IsNullOrWhiteSpace(numeroIdentificacion))
-            {
-                return BadRequest(new { message = "Debe proporcionar un número de identificación para buscar" });
-            }
-
-            var asegurados = await _context.Asegurados
-                .Where(a => a.NumeroIdentificacion.ToString().Contains(numeroIdentificacion))
-                .OrderBy(a => a.NumeroIdentificacion)
-                .ToListAsync();
-
-            return Ok(asegurados);
+            var result = await _service.SearchByIdentificationAsync(numeroIdentificacion);
+            return Ok(result);
         }
 
         /// <summary>
         /// Crear un nuevo asegurado
         /// </summary>
-        /// <param name="asegurado">Datos del asegurado a crear</param>
+        /// <param name="request">Datos del asegurado a crear</param>
         /// <returns>Asegurado creado</returns>
         [HttpPost]
-        public async Task<ActionResult<Asegurado>> CreateAsegurado(Asegurado asegurado)
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> CreateAsegurado([FromBody] CreateAseguradoRequest request)
         {
-            // Validar que el número de identificación no exista
-            if (await _context.Asegurados.AnyAsync(a => a.NumeroIdentificacion == asegurado.NumeroIdentificacion))
+            if (!ModelState.IsValid)
             {
-                return Conflict(new { message = $"Ya existe un asegurado con el número de identificación {asegurado.NumeroIdentificacion}" });
+                return BadRequest(ModelState);
             }
 
-            // Validar que el email no exista
-            if (await _context.Asegurados.AnyAsync(a => a.Email == asegurado.Email))
-            {
-                return Conflict(new { message = $"Ya existe un asegurado con el correo electrónico {asegurado.Email}" });
-            }
-
-            // Validar que la fecha de nacimiento no sea futura
-            if (asegurado.FechaNacimiento > DateTime.Now)
-            {
-                return BadRequest(new { message = "La fecha de nacimiento no puede ser una fecha futura" });
-            }
-
-            // Validar edad mínima (por ejemplo, 18 años)
-            var edad = DateTime.Now.Year - asegurado.FechaNacimiento.Year;
-            if (asegurado.FechaNacimiento > DateTime.Now.AddYears(-edad)) edad--;
-            
-            if (edad < 18)
-            {
-                return BadRequest(new { message = "El asegurado debe ser mayor de 18 años" });
-            }
-
-            asegurado.FechaCreacion = DateTime.UtcNow;
-            asegurado.FechaActualizacion = null;
-
-            _context.Asegurados.Add(asegurado);
-            
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException ex)
-            {
-                return StatusCode(500, new { message = "Error al guardar el asegurado en la base de datos", error = ex.Message });
-            }
-
-            return CreatedAtAction(nameof(GetAsegurado), new { id = asegurado.NumeroIdentificacion }, asegurado);
+            var result = await _service.CreateAsync(request);
+            return CreatedAtAction(nameof(GetAsegurado), new { id = result.NumeroIdentificacion }, result);
         }
 
         /// <summary>
         /// Actualizar un asegurado existente
         /// </summary>
         /// <param name="id">Número de identificación del asegurado</param>
-        /// <param name="asegurado">Datos actualizados del asegurado</param>
-        /// <returns>Resultado de la operación</returns>
+        /// <param name="request">Datos actualizados del asegurado</param>
+        /// <returns>Asegurado actualizado</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateAsegurado(long id, Asegurado asegurado)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateAsegurado(long id, [FromBody] UpdateAseguradoRequest request)
         {
-            if (id != asegurado.NumeroIdentificacion)
+            if (!ModelState.IsValid)
             {
-                return BadRequest(new { message = "El número de identificación no coincide" });
+                return BadRequest(ModelState);
             }
 
-            var aseguradoExistente = await _context.Asegurados.FindAsync(id);
-            if (aseguradoExistente == null)
-            {
-                return NotFound(new { message = $"No se encontró un asegurado con el número de identificación {id}" });
-            }
-
-            // Validar que el email no exista en otro registro
-            if (await _context.Asegurados.AnyAsync(a => a.Email == asegurado.Email && a.NumeroIdentificacion != id))
-            {
-                return Conflict(new { message = $"Ya existe otro asegurado con el correo electrónico {asegurado.Email}" });
-            }
-
-            // Validar que la fecha de nacimiento no sea futura
-            if (asegurado.FechaNacimiento > DateTime.Now)
-            {
-                return BadRequest(new { message = "La fecha de nacimiento no puede ser una fecha futura" });
-            }
-
-            // Validar edad mínima
-            var edad = DateTime.Now.Year - asegurado.FechaNacimiento.Year;
-            if (asegurado.FechaNacimiento > DateTime.Now.AddYears(-edad)) edad--;
-            
-            if (edad < 18)
-            {
-                return BadRequest(new { message = "El asegurado debe ser mayor de 18 años" });
-            }
-
-            // Actualizar campos
-            aseguradoExistente.PrimerNombre = asegurado.PrimerNombre;
-            aseguradoExistente.SegundoNombre = asegurado.SegundoNombre;
-            aseguradoExistente.PrimerApellido = asegurado.PrimerApellido;
-            aseguradoExistente.SegundoApellido = asegurado.SegundoApellido;
-            aseguradoExistente.TelefonoContacto = asegurado.TelefonoContacto;
-            aseguradoExistente.Email = asegurado.Email;
-            aseguradoExistente.FechaNacimiento = asegurado.FechaNacimiento;
-            aseguradoExistente.ValorEstimadoSolicitud = asegurado.ValorEstimadoSolicitud;
-            aseguradoExistente.Observaciones = asegurado.Observaciones;
-            aseguradoExistente.FechaActualizacion = DateTime.UtcNow;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await AseguradoExists(id))
-                {
-                    return NotFound(new { message = $"No se encontró un asegurado con el número de identificación {id}" });
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            catch (DbUpdateException ex)
-            {
-                return StatusCode(500, new { message = "Error al actualizar el asegurado en la base de datos", error = ex.Message });
-            }
-
-            return Ok(new { message = "Asegurado actualizado exitosamente", data = aseguradoExistente });
+            var result = await _service.UpdateAsync(id, request);
+            return Ok(result);
         }
 
         /// <summary>
@@ -225,31 +125,13 @@ namespace SegurosAPI.Controllers
         /// <param name="id">Número de identificación del asegurado</param>
         /// <returns>Resultado de la operación</returns>
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteAsegurado(long id)
         {
-            var asegurado = await _context.Asegurados.FindAsync(id);
-            if (asegurado == null)
-            {
-                return NotFound(new { message = $"No se encontró un asegurado con el número de identificación {id}" });
-            }
-
-            _context.Asegurados.Remove(asegurado);
-            
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException ex)
-            {
-                return StatusCode(500, new { message = "Error al eliminar el asegurado de la base de datos", error = ex.Message });
-            }
-
+            await _service.DeleteAsync(id);
             return Ok(new { message = "Asegurado eliminado exitosamente" });
-        }
-
-        private async Task<bool> AseguradoExists(long id)
-        {
-            return await _context.Asegurados.AnyAsync(e => e.NumeroIdentificacion == id);
         }
     }
 }

@@ -49,3 +49,13 @@ export interface CreateAseguradoDto {
  * DTO para actualizar un asegurado existente
  */
 export interface UpdateAseguradoDto extends CreateAseguradoDto {}
+
+/**
+ * Respuesta de búsqueda con metadata
+ */
+export interface SearchResponse {
+  results: Asegurado[];
+  totalCount: number;
+  searchTerm?: string;
+  message?: string;
+}
