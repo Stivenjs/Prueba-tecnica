@@ -4,11 +4,11 @@
     <p>Cargando datos...</p>
   </div>
 
-  <app-asegurado-form
-    *ngIf="!isLoadingData() && asegurado()"
-    [asegurado]="asegurado()!"
+  <app-insured-form
+    *ngIf="!isLoadingData() && insured()"
+    [insured]="insured()!"
     [isLoading]="isLoading()"
     (submitForm)="onSubmit($event)"
     (cancelForm)="onCancel()">
-  </app-asegurado-form>
+  </app-insured-form>
 </div>

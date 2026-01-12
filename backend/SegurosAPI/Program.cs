@@ -16,10 +16,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Inyección de Dependencias - Repositories
-builder.Services.AddScoped<IAseguradoRepository, AseguradoRepository>();
+builder.Services.AddScoped<IInsuredRepository, InsuredRepository>();
 
 // Inyección de Dependencias - Services
-builder.Services.AddScoped<IAseguradoService, AseguradoService>();
+builder.Services.AddScoped<IInsuredService, InsuredService>();
 
 // Configurar CORS para permitir conexión con Angular
 builder.Services.AddCors(options =>

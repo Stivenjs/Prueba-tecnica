@@ -13,16 +13,16 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { Asegurado, CreateAseguradoDto } from '@shared/models/asegurado.model';
+import { Insured, CreateInsuredDto } from '@shared/models/insured.model';
 
 /**
  * Componente de formulario para crear/editar asegurados
  * Utiliza Reactive Forms para un control total y validaciones robustas
  */
 @Component({
-  selector: 'app-asegurado-form',
-  templateUrl: './asegurado-form.html',
-  styleUrls: ['./asegurado-form.css'],
+  selector: 'app-insured-form',
+  templateUrl: './insured-form.html',
+  styleUrls: ['./insured-form.css'],
   standalone: true,
   imports: [
     CommonModule,
@@ -36,22 +36,22 @@ import { Asegurado, CreateAseguradoDto } from '@shared/models/asegurado.model';
     MatProgressSpinnerModule
   ]
 })
-export class AseguradoFormComponent implements OnInit {
+export class InsuredFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
 
-  @Input() asegurado?: Asegurado; // Para edición
+  @Input() insured?: Insured; // Para edición
   @Input() isLoading = false;
-  @Output() submitForm = new EventEmitter<CreateAseguradoDto>();
+  @Output() submitForm = new EventEmitter<CreateInsuredDto>();
   @Output() cancelForm = new EventEmitter<void>();
 
-  aseguradoForm!: FormGroup;
+  insuredForm!: FormGroup;
   isEditMode = false;
   maxDate = new Date(); // No permitir fechas futuras
 
   ngOnInit(): void {
     this.initForm();
     
-    if (this.asegurado) {
+    if (this.insured) {
       this.isEditMode = true;
       this.patchFormValues();
     }
@@ -61,8 +61,8 @@ export class AseguradoFormComponent implements OnInit {
    * Inicializar el formulario con validaciones
    */
   private initForm(): void {
-    this.aseguradoForm = this.fb.group({
-      numeroIdentificacion: [
+    this.insuredForm = this.fb.group({
+      identificationNumber: [
         { value: '', disabled: this.isEditMode }, 
         [
           Validators.required,
@@ -70,7 +70,7 @@ export class AseguradoFormComponent implements OnInit {
           Validators.pattern('^[0-9]+$')
         ]
       ],
-      primerNombre: [
+      firstName: [
         '', 
         [
           Validators.required,
@@ -79,23 +79,14 @@ export class AseguradoFormComponent implements OnInit {
           Validators.pattern('^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$')
         ]
       ],
-      segundoNombre: [
+      middleName: [
         '', 
         [
           Validators.maxLength(50),
           Validators.pattern('^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$')
         ]
       ],
-      primerApellido: [
-        '', 
-        [
-          Validators.required,
-          Validators.minLength(2),
-          Validators.maxLength(50),
-          Validators.pattern('^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$')
-        ]
-      ],
-      segundoApellido: [
+      firstLastName: [
         '', 
         [
           Validators.required,
@@ -104,7 +95,16 @@ export class AseguradoFormComponent implements OnInit {
           Validators.pattern('^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$')
         ]
       ],
-      telefonoContacto: [
+      secondLastName: [
+        '', 
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.maxLength(50),
+          Validators.pattern('^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$')
+        ]
+      ],
+      contactPhone: [
         '', 
         [
           Validators.required,
@@ -121,14 +121,14 @@ export class AseguradoFormComponent implements OnInit {
           Validators.maxLength(100)
         ]
       ],
-      fechaNacimiento: [
+      birthDate: [
         '', 
         [
           Validators.required,
-          this.validarEdadMinima(18)
+          this.validateMinimumAge(18)
         ]
       ],
-      valorEstimadoSolicitud: [
+      estimatedRequestValue: [
         '', 
         [
           Validators.required,
@@ -136,7 +136,7 @@ export class AseguradoFormComponent implements OnInit {
           Validators.pattern('^[0-9]+(\.[0-9]{1,2})?$')
         ]
       ],
-      observaciones: [
+      observations: [
         '', 
         [Validators.maxLength(500)]
       ]
@@ -147,39 +147,39 @@ export class AseguradoFormComponent implements OnInit {
    * Rellenar el formulario con datos del asegurado (modo edición)
    */
   private patchFormValues(): void {
-    if (!this.asegurado) return;
+    if (!this.insured) return;
 
-    this.aseguradoForm.patchValue({
-      numeroIdentificacion: this.asegurado.numeroIdentificacion,
-      primerNombre: this.asegurado.primerNombre,
-      segundoNombre: this.asegurado.segundoNombre || '',
-      primerApellido: this.asegurado.primerApellido,
-      segundoApellido: this.asegurado.segundoApellido,
-      telefonoContacto: this.asegurado.telefonoContacto,
-      email: this.asegurado.email,
-      fechaNacimiento: new Date(this.asegurado.fechaNacimiento),
-      valorEstimadoSolicitud: this.asegurado.valorEstimadoSolicitud,
-      observaciones: this.asegurado.observaciones || ''
+    this.insuredForm.patchValue({
+      identificationNumber: this.insured.identificationNumber,
+      firstName: this.insured.firstName,
+      middleName: this.insured.middleName || '',
+      firstLastName: this.insured.firstLastName,
+      secondLastName: this.insured.secondLastName,
+      contactPhone: this.insured.contactPhone,
+      email: this.insured.email,
+      birthDate: new Date(this.insured.birthDate),
+      estimatedRequestValue: this.insured.estimatedRequestValue,
+      observations: this.insured.observations || ''
     });
   }
 
   /**
    * Validador personalizado: edad mínima
    */
-  private validarEdadMinima(edadMinima: number) {
+  private validateMinimumAge(minimumAge: number) {
     return (control: any) => {
       if (!control.value) return null;
 
-      const fechaNacimiento = new Date(control.value);
-      const hoy = new Date();
-      let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
-      const mes = hoy.getMonth() - fechaNacimiento.getMonth();
+      const birthDate = new Date(control.value);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const month = today.getMonth() - birthDate.getMonth();
       
-      if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
-        edad--;
+      if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
       }
 
-      return edad >= edadMinima ? null : { edadMinima: { required: edadMinima, actual: edad } };
+      return age >= minimumAge ? null : { minimumAge: { required: minimumAge, actual: age } };
     };
   }
 
@@ -187,7 +187,7 @@ export class AseguradoFormComponent implements OnInit {
    * Obtener mensaje de error para un campo
    */
   getErrorMessage(fieldName: string): string {
-    const control = this.aseguradoForm.get(fieldName);
+    const control = this.insuredForm.get(fieldName);
     if (!control || !control.errors) return '';
 
     if (control.hasError('required')) return 'Este campo es requerido';
@@ -196,7 +196,7 @@ export class AseguradoFormComponent implements OnInit {
     if (control.hasError('minlength')) return `Mínimo ${control.errors['minlength'].requiredLength} caracteres`;
     if (control.hasError('maxlength')) return `Máximo ${control.errors['maxlength'].requiredLength} caracteres`;
     if (control.hasError('pattern')) return 'Formato inválido';
-    if (control.hasError('edadMinima')) return `Edad mínima: ${control.errors['edadMinima'].required} años`;
+    if (control.hasError('minimumAge')) return `Edad mínima: ${control.errors['minimumAge'].required} años`;
 
     return 'Campo inválido';
   }
@@ -205,25 +205,25 @@ export class AseguradoFormComponent implements OnInit {
    * Enviar formulario
    */
   onSubmit(): void {
-    if (this.aseguradoForm.invalid) {
-      this.aseguradoForm.markAllAsTouched();
+    if (this.insuredForm.invalid) {
+      this.insuredForm.markAllAsTouched();
       return;
     }
 
-    const formValue = this.aseguradoForm.getRawValue();
+    const formValue = this.insuredForm.getRawValue();
     
     // Formatear fecha a ISO 8601
-    const fechaNacimiento = new Date(formValue.fechaNacimiento);
-    fechaNacimiento.setHours(0, 0, 0, 0);
+    const birthDate = new Date(formValue.birthDate);
+    birthDate.setHours(0, 0, 0, 0);
     
-    const aseguradoData: CreateAseguradoDto = {
+    const insuredData: CreateInsuredDto = {
       ...formValue,
-      fechaNacimiento: fechaNacimiento.toISOString(),
-      numeroIdentificacion: Number(formValue.numeroIdentificacion),
-      valorEstimadoSolicitud: Number(formValue.valorEstimadoSolicitud)
+      birthDate: birthDate.toISOString(),
+      identificationNumber: Number(formValue.identificationNumber),
+      estimatedRequestValue: Number(formValue.estimatedRequestValue)
     };
 
-    this.submitForm.emit(aseguradoData);
+    this.submitForm.emit(insuredData);
   }
 
   /**
@@ -237,6 +237,6 @@ export class AseguradoFormComponent implements OnInit {
    * Resetear formulario
    */
   resetForm(): void {
-    this.aseguradoForm.reset();
+    this.insuredForm.reset();
   }
 }

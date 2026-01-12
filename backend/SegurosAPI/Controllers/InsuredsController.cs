@@ -10,12 +10,12 @@ namespace SegurosAPI.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    public class AseguradosController : ControllerBase
+    public class InsuredsController : ControllerBase
     {
-        private readonly IAseguradoService _service;
-        private readonly ILogger<AseguradosController> _logger;
+        private readonly IInsuredService _service;
+        private readonly ILogger<InsuredsController> _logger;
 
-        public AseguradosController(IAseguradoService service, ILogger<AseguradosController> logger)
+        public InsuredsController(IInsuredService service, ILogger<InsuredsController> logger)
         {
             _service = service;
             _logger = logger;
@@ -30,7 +30,7 @@ namespace SegurosAPI.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAsegurados(
+        public async Task<IActionResult> GetInsureds(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10)
         {
@@ -47,7 +47,7 @@ namespace SegurosAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAsegurado(long id)
+        public async Task<IActionResult> GetInsured(long id)
         {
             var result = await _service.GetByIdAsync(id);
             return Ok(result);
@@ -56,7 +56,7 @@ namespace SegurosAPI.Controllers
         /// <summary>
         /// Buscar asegurados por número de identificación (búsqueda parcial)
         /// </summary>
-        /// <param name="numeroIdentificacion">Número de identificación a buscar</param>
+        /// <param name="identificationNumber">Número de identificación a buscar</param>
         /// <returns>Resultado de la búsqueda con metadata</returns>
         /// <remarks>
         /// Devuelve un objeto con:
@@ -65,13 +65,13 @@ namespace SegurosAPI.Controllers
         /// - searchTerm: Término de búsqueda usado
         /// - message: Mensaje informativo sobre el resultado
         /// </remarks>
-        [HttpGet("buscar/{numeroIdentificacion}")]
+        [HttpGet("search/{identificationNumber}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> BuscarPorIdentificacion(string numeroIdentificacion)
+        public async Task<IActionResult> SearchByIdentification(string identificationNumber)
         {
-            var result = await _service.SearchByIdentificationAsync(numeroIdentificacion);
+            var result = await _service.SearchByIdentificationAsync(identificationNumber);
             return Ok(result);
         }
 
@@ -85,7 +85,7 @@ namespace SegurosAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CreateAsegurado([FromBody] CreateAseguradoRequest request)
+        public async Task<IActionResult> CreateInsured([FromBody] CreateInsuredRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -93,7 +93,7 @@ namespace SegurosAPI.Controllers
             }
 
             var result = await _service.CreateAsync(request);
-            return CreatedAtAction(nameof(GetAsegurado), new { id = result.NumeroIdentificacion }, result);
+            return CreatedAtAction(nameof(GetInsured), new { id = result.IdentificationNumber }, result);
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace SegurosAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateAsegurado(long id, [FromBody] UpdateAseguradoRequest request)
+        public async Task<IActionResult> UpdateInsured(long id, [FromBody] UpdateInsuredRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -128,10 +128,10 @@ namespace SegurosAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteAsegurado(long id)
+        public async Task<IActionResult> DeleteInsured(long id)
         {
             await _service.DeleteAsync(id);
-            return Ok(new { message = "Asegurado eliminado exitosamente" });
+            return Ok(new { message = "Insured deleted successfully" });
         }
     }
 }

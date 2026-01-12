@@ -6,7 +6,7 @@
   </mat-card-header>
 
   <mat-card-content>
-    <form [formGroup]="aseguradoForm" (ngSubmit)="onSubmit()" class="form-container">
+    <form [formGroup]="insuredForm" (ngSubmit)="onSubmit()" class="form-container">
       
       <!-- Número de Identificación -->
       <mat-form-field appearance="outline" class="full-width">
@@ -14,10 +14,10 @@
         <input 
           matInput 
           type="number" 
-          formControlName="numeroIdentificacion"
+          formControlName="identificationNumber"
           placeholder="Ej: 1234567890">
-        <mat-error *ngIf="aseguradoForm.get('numeroIdentificacion')?.invalid">
-          {{ getErrorMessage('numeroIdentificacion') }}
+        <mat-error *ngIf="insuredForm.get('identificationNumber')?.invalid">
+          {{ getErrorMessage('identificationNumber') }}
         </mat-error>
       </mat-form-field>
 
@@ -27,10 +27,10 @@
           <mat-label>Primer Nombre *</mat-label>
           <input 
             matInput 
-            formControlName="primerNombre"
+            formControlName="firstName"
             placeholder="Ej: Juan">
-          <mat-error *ngIf="aseguradoForm.get('primerNombre')?.invalid">
-            {{ getErrorMessage('primerNombre') }}
+          <mat-error *ngIf="insuredForm.get('firstName')?.invalid">
+            {{ getErrorMessage('firstName') }}
           </mat-error>
         </mat-form-field>
 
@@ -38,10 +38,10 @@
           <mat-label>Segundo Nombre</mat-label>
           <input 
             matInput 
-            formControlName="segundoNombre"
+            formControlName="middleName"
             placeholder="Ej: Carlos">
-          <mat-error *ngIf="aseguradoForm.get('segundoNombre')?.invalid">
-            {{ getErrorMessage('segundoNombre') }}
+          <mat-error *ngIf="insuredForm.get('middleName')?.invalid">
+            {{ getErrorMessage('middleName') }}
           </mat-error>
         </mat-form-field>
       </div>
@@ -52,10 +52,10 @@
           <mat-label>Primer Apellido *</mat-label>
           <input 
             matInput 
-            formControlName="primerApellido"
+            formControlName="firstLastName"
             placeholder="Ej: Pérez">
-          <mat-error *ngIf="aseguradoForm.get('primerApellido')?.invalid">
-            {{ getErrorMessage('primerApellido') }}
+          <mat-error *ngIf="insuredForm.get('firstLastName')?.invalid">
+            {{ getErrorMessage('firstLastName') }}
           </mat-error>
         </mat-form-field>
 
@@ -63,10 +63,10 @@
           <mat-label>Segundo Apellido *</mat-label>
           <input 
             matInput 
-            formControlName="segundoApellido"
+            formControlName="secondLastName"
             placeholder="Ej: García">
-          <mat-error *ngIf="aseguradoForm.get('segundoApellido')?.invalid">
-            {{ getErrorMessage('segundoApellido') }}
+          <mat-error *ngIf="insuredForm.get('secondLastName')?.invalid">
+            {{ getErrorMessage('secondLastName') }}
           </mat-error>
         </mat-form-field>
       </div>
@@ -77,10 +77,10 @@
           <mat-label>Teléfono de Contacto *</mat-label>
           <input 
             matInput 
-            formControlName="telefonoContacto"
+            formControlName="contactPhone"
             placeholder="Ej: 3001234567">
-          <mat-error *ngIf="aseguradoForm.get('telefonoContacto')?.invalid">
-            {{ getErrorMessage('telefonoContacto') }}
+          <mat-error *ngIf="insuredForm.get('contactPhone')?.invalid">
+            {{ getErrorMessage('contactPhone') }}
           </mat-error>
         </mat-form-field>
 
@@ -91,7 +91,7 @@
             type="email" 
             formControlName="email"
             placeholder="Ej: juan.perez@example.com">
-          <mat-error *ngIf="aseguradoForm.get('email')?.invalid">
+          <mat-error *ngIf="insuredForm.get('email')?.invalid">
             {{ getErrorMessage('email') }}
           </mat-error>
         </mat-form-field>
@@ -104,13 +104,13 @@
           <input 
             matInput 
             [matDatepicker]="picker"
-            formControlName="fechaNacimiento"
+            formControlName="birthDate"
             [max]="maxDate"
             placeholder="DD/MM/AAAA">
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
-          <mat-error *ngIf="aseguradoForm.get('fechaNacimiento')?.invalid">
-            {{ getErrorMessage('fechaNacimiento') }}
+          <mat-error *ngIf="insuredForm.get('birthDate')?.invalid">
+            {{ getErrorMessage('birthDate') }}
           </mat-error>
         </mat-form-field>
 
@@ -119,11 +119,11 @@
           <input 
             matInput 
             type="number" 
-            formControlName="valorEstimadoSolicitud"
+            formControlName="estimatedRequestValue"
             placeholder="Ej: 5000000">
           <span matPrefix>$ &nbsp;</span>
-          <mat-error *ngIf="aseguradoForm.get('valorEstimadoSolicitud')?.invalid">
-            {{ getErrorMessage('valorEstimadoSolicitud') }}
+          <mat-error *ngIf="insuredForm.get('estimatedRequestValue')?.invalid">
+            {{ getErrorMessage('estimatedRequestValue') }}
           </mat-error>
         </mat-form-field>
       </div>
@@ -133,14 +133,14 @@
         <mat-label>Observaciones</mat-label>
         <textarea 
           matInput 
-          formControlName="observaciones"
+          formControlName="observations"
           rows="4"
           placeholder="Ingrese observaciones adicionales..."></textarea>
         <mat-hint align="end">
-          {{ aseguradoForm.get('observaciones')?.value?.length || 0 }} / 500
+          {{ insuredForm.get('observations')?.value?.length || 0 }} / 500
         </mat-hint>
-        <mat-error *ngIf="aseguradoForm.get('observaciones')?.invalid">
-          {{ getErrorMessage('observaciones') }}
+        <mat-error *ngIf="insuredForm.get('observations')?.invalid">
+          {{ getErrorMessage('observations') }}
         </mat-error>
       </mat-form-field>
 
@@ -158,7 +158,7 @@
           mat-raised-button 
           color="primary" 
           type="submit"
-          [disabled]="isLoading || aseguradoForm.invalid">
+          [disabled]="isLoading || insuredForm.invalid">
           <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
           <span *ngIf="!isLoading">
             {{ isEditMode ? 'Actualizar' : 'Guardar' }}

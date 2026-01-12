@@ -1,31 +1,31 @@
 import { Routes } from '@angular/router';
-import { AseguradosPageComponent } from '@features/asegurados/pages/asegurados-page/asegurados-page';
-import { AseguradoCreatePageComponent } from '@features/asegurados/pages/asegurado-create-page/asegurado-create-page';
-import { AseguradoEditPageComponent } from '@features/asegurados/pages/asegurado-edit-page/asegurado-edit-page';
+import { InsuredsPageComponent } from '@features/insureds/pages/insureds-page/insureds-page';
+import { InsuredCreatePageComponent } from '@features/insureds/pages/insured-create-page/insured-create-page';
+import { InsuredEditPageComponent } from '@features/insureds/pages/insured-edit-page/insured-edit-page';
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: '/asegurados',
+    redirectTo: '/insureds',
     pathMatch: 'full'
   },
   {
-    path: 'asegurados',
-    component: AseguradosPageComponent,
+    path: 'insureds',
+    component: InsuredsPageComponent,
     title: 'Gestión de Asegurados'
   },
   {
-    path: 'asegurados/nuevo',
-    component: AseguradoCreatePageComponent,
+    path: 'insureds/new',
+    component: InsuredCreatePageComponent,
     title: 'Nuevo Asegurado'
   },
   {
-    path: 'asegurados/editar/:id',
-    component: AseguradoEditPageComponent,
+    path: 'insureds/edit/:id',
+    component: InsuredEditPageComponent,
     title: 'Editar Asegurado'
   },
   {
     path: '**',
-    redirectTo: '/asegurados'
+    redirectTo: '/insureds'
   }
 ];

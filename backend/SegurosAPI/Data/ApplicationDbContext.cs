@@ -10,42 +10,42 @@ namespace SegurosAPI.Data
         {
         }
 
-        public DbSet<Asegurado> Asegurados { get; set; }
+        public DbSet<Insured> Insureds { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             // Configuración de la entidad Asegurado
-            modelBuilder.Entity<Asegurado>(entity =>
+            modelBuilder.Entity<Insured>(entity =>
             {
                 // Configurar la tabla
-                entity.ToTable("Asegurados");
+                entity.ToTable("Insureds");
 
                 // Configurar la llave primaria
-                entity.HasKey(e => e.NumeroIdentificacion);
+                entity.HasKey(e => e.IdentificationNumber);
 
                 // Configurar índices
                 entity.HasIndex(e => e.Email).IsUnique();
-                entity.HasIndex(e => e.NumeroIdentificacion);
+                entity.HasIndex(e => e.IdentificationNumber);
 
                 // Configurar propiedades
-                entity.Property(e => e.PrimerNombre)
+                entity.Property(e => e.FirstName)
                     .IsRequired()
                     .HasMaxLength(50);
 
-                entity.Property(e => e.SegundoNombre)
+                entity.Property(e => e.MiddleName)
                     .HasMaxLength(50);
 
-                entity.Property(e => e.PrimerApellido)
+                entity.Property(e => e.FirstLastName)
                     .IsRequired()
                     .HasMaxLength(50);
 
-                entity.Property(e => e.SegundoApellido)
+                entity.Property(e => e.SecondLastName)
                     .IsRequired()
                     .HasMaxLength(50);
 
-                entity.Property(e => e.TelefonoContacto)
+                entity.Property(e => e.ContactPhone)
                     .IsRequired()
                     .HasMaxLength(20);
 
@@ -53,14 +53,14 @@ namespace SegurosAPI.Data
                     .IsRequired()
                     .HasMaxLength(100);
 
-                entity.Property(e => e.ValorEstimadoSolicitud)
+                entity.Property(e => e.EstimatedRequestValue)
                     .HasColumnType("decimal(18,2)")
                     .IsRequired();
 
-                entity.Property(e => e.Observaciones)
+                entity.Property(e => e.Observations)
                     .HasMaxLength(500);
 
-                entity.Property(e => e.FechaCreacion)
+                entity.Property(e => e.CreatedAt)
                     .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
         }

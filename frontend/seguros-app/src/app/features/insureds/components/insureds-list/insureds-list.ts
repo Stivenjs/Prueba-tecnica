@@ -13,17 +13,17 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { AseguradosService } from '@core/services/asegurados.service';
-import { Asegurado } from '@shared/models/asegurado.model';
+import { InsuredsService } from '@core/services/insureds.service';
+import { Insured } from '@shared/models/insured.model';
 
 /**
  * Componente de lista/tabla de asegurados
  * Incluye búsqueda, paginación, edición y eliminación
  */
 @Component({
-  selector: 'app-asegurados-list',
-  templateUrl: './asegurados-list.html',
-  styleUrls: ['./asegurados-list.css'],
+  selector: 'app-insureds-list',
+  templateUrl: './insureds-list.html',
+  styleUrls: ['./insureds-list.css'],
   standalone: true,
   imports: [
     CommonModule,
@@ -41,24 +41,24 @@ import { Asegurado } from '@shared/models/asegurado.model';
     MatTooltipModule
   ]
 })
-export class AseguradosListComponent implements OnInit {
-  private readonly aseguradosService = inject(AseguradosService);
+export class InsuredsListComponent implements OnInit {
+  private readonly insuredsService = inject(InsuredsService);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
 
   displayedColumns: string[] = [
-    'numeroIdentificacion',
-    'nombreCompleto',
+    'identificationNumber',
+    'fullName',
     'email',
-    'telefono',
-    'fechaNacimiento',
-    'valorSolicitud',
-    'acciones'
+    'phone',
+    'birthDate',
+    'requestValue',
+    'actions'
   ];
 
   // Usando Signals para reactividad automática
-  asegurados = signal<Asegurado[]>([]);
+  insureds = signal<Insured[]>([]);
   isLoading = signal(false);
   searchTerm = signal('');
   
@@ -69,24 +69,24 @@ export class AseguradosListComponent implements OnInit {
   pageSizeOptions = [5, 10, 20, 50];
 
   ngOnInit(): void {
-    this.loadAsegurados();
+    this.loadInsureds();
   }
 
   /**
    * Cargar asegurados con paginación
    */
-  loadAsegurados(): void {
+  loadInsureds(): void {
     this.isLoading.set(true);
-    this.aseguradosService.getAsegurados(this.currentPage(), this.pageSize())
+    this.insuredsService.getInsureds(this.currentPage(), this.pageSize())
       .subscribe({
         next: (response) => {
-          this.asegurados.set(response.data);
+          this.insureds.set(response.data);
           this.totalRecords.set(response.totalRecords);
           this.isLoading.set(false);
         },
         error: (error) => {
-          console.error('Error al cargar asegurados:', error);
-          this.showMessage('Error al cargar asegurados', 'error');
+          console.error('Error loading insureds:', error);
+          this.showMessage('Error loading insureds', 'error');
           this.isLoading.set(false);
         }
       });
@@ -97,15 +97,15 @@ export class AseguradosListComponent implements OnInit {
    */
   onSearch(): void {
     if (!this.searchTerm() || this.searchTerm().trim() === '') {
-      this.loadAsegurados();
+      this.loadInsureds();
       return;
     }
 
     this.isLoading.set(true);
-    this.aseguradosService.buscarPorIdentificacion(this.searchTerm())
+    this.insuredsService.searchByIdentification(this.searchTerm())
       .subscribe({
         next: (response) => {
-          this.asegurados.set(response.results);
+          this.insureds.set(response.results);
           this.totalRecords.set(response.totalCount);
           this.isLoading.set(false);
           
@@ -116,8 +116,8 @@ export class AseguradosListComponent implements OnInit {
           }
         },
         error: (error) => {
-          console.error('Error en la búsqueda:', error);
-          this.showMessage('Error en la búsqueda', 'error');
+          console.error('Search error:', error);
+          this.showMessage('Search error', 'error');
           this.isLoading.set(false);
         }
       });
@@ -129,7 +129,7 @@ export class AseguradosListComponent implements OnInit {
   clearSearch(): void {
     this.searchTerm.set('');
     this.currentPage.set(1);
-    this.loadAsegurados();
+    this.loadInsureds();
   }
 
   /**
@@ -138,43 +138,43 @@ export class AseguradosListComponent implements OnInit {
   onPageChange(event: PageEvent): void {
     this.currentPage.set(event.pageIndex + 1);
     this.pageSize.set(event.pageSize);
-    this.loadAsegurados();
+    this.loadInsureds();
   }
 
   /**
    * Navegar a crear nuevo asegurado
    */
   onCreateNew(): void {
-    this.router.navigate(['/asegurados/nuevo']);
+    this.router.navigate(['/insureds/new']);
   }
 
   /**
    * Editar asegurado
    */
-  onEdit(asegurado: Asegurado): void {
-    this.router.navigate(['/asegurados/editar', asegurado.numeroIdentificacion]);
+  onEdit(insured: Insured): void {
+    this.router.navigate(['/insureds/edit', insured.identificationNumber]);
   }
 
   /**
    * Eliminar asegurado con confirmación
    */
-  onDelete(asegurado: Asegurado): void {
-    const confirmacion = confirm(
-      `¿Está seguro que desea eliminar al asegurado ${asegurado.primerNombre} ${asegurado.primerApellido}?`
+  onDelete(insured: Insured): void {
+    const confirmation = confirm(
+      `Are you sure you want to delete the insured ${insured.firstName} ${insured.firstLastName}?`
     );
 
-    if (!confirmacion) return;
+    if (!confirmation) return;
 
     this.isLoading.set(true);
-    this.aseguradosService.deleteAsegurado(asegurado.numeroIdentificacion)
+    this.insuredsService.deleteInsured(insured.identificationNumber)
       .subscribe({
         next: () => {
-          this.showMessage('Asegurado eliminado exitosamente', 'success');
-          this.loadAsegurados();
+          this.showMessage('Insured deleted successfully', 'success');
+          this.loadInsureds();
         },
         error: (error) => {
-          console.error('Error al eliminar asegurado:', error);
-          this.showMessage('Error al eliminar asegurado', 'error');
+          console.error('Error deleting insured:', error);
+          this.showMessage('Error deleting insured', 'error');
           this.isLoading.set(false);
         }
       });
@@ -183,9 +183,9 @@ export class AseguradosListComponent implements OnInit {
   /**
    * Obtener nombre completo
    */
-  getNombreCompleto(asegurado: Asegurado): string {
-    const segundo = asegurado.segundoNombre ? ` ${asegurado.segundoNombre}` : '';
-    return `${asegurado.primerNombre}${segundo} ${asegurado.primerApellido} ${asegurado.segundoApellido}`;
+  getFullName(insured: Insured): string {
+    const middle = insured.middleName ? ` ${insured.middleName}` : '';
+    return `${insured.firstName}${middle} ${insured.firstLastName} ${insured.secondLastName}`;
   }
 
   /**

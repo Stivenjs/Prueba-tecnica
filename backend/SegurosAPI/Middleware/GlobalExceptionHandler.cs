@@ -26,7 +26,7 @@ namespace SegurosAPI.Middleware
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ocurrió una excepción no controlada");
+                _logger.LogError(ex, "An unhandled exception occurred");
                 await HandleExceptionAsync(context, ex);
             }
         }
@@ -34,7 +34,7 @@ namespace SegurosAPI.Middleware
         private static Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             var code = HttpStatusCode.InternalServerError;
-            var message = "Ocurrió un error interno en el servidor";
+            var message = "An internal server error occurred";
 
             switch (exception)
             {
