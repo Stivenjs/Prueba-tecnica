@@ -35,6 +35,7 @@ namespace SegurosAPI.Middleware
         {
             var code = HttpStatusCode.InternalServerError;
             var message = "An internal server error occurred";
+            List<string>? errors = null;
 
             switch (exception)
             {
@@ -42,17 +43,41 @@ namespace SegurosAPI.Middleware
                     code = HttpStatusCode.NotFound;
                     message = exception.Message;
                     break;
+                
+                case ConflictException:
+                    code = HttpStatusCode.Conflict;
+                    message = exception.Message;
+                    break;
+                
+                case ValidationException validationEx:
+                    code = HttpStatusCode.BadRequest;
+                    message = validationEx.Message;
+                    if (validationEx.Errors != null)
+                    {
+                        errors = validationEx.Errors
+                            .SelectMany(e => e.Value.Select(v => $"{e.Key}: {v}"))
+                            .ToList();
+                    }
+                    break;
+                
                 case BusinessException:
                     code = HttpStatusCode.BadRequest;
                     message = exception.Message;
                     break;
             }
 
-            var result = JsonSerializer.Serialize(new
+            var response = new
             {
                 success = false,
                 message = message,
-                error = exception.Message
+                errors = errors
+            };
+
+            var result = JsonSerializer.Serialize(response, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
             });
 
             context.Response.ContentType = "application/json";

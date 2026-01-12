@@ -57,7 +57,7 @@ namespace SegurosAPI.Services.Implementations
         {
             if (string.IsNullOrWhiteSpace(identificationNumber))
             {
-                throw new BusinessException("You must provide an identification number to search");
+                throw new ValidationException("You must provide an identification number to search");
             }
 
             var insureds = await _repository.SearchByIdentificationAsync(identificationNumber);
@@ -81,13 +81,13 @@ namespace SegurosAPI.Services.Implementations
             // Validar que no exista
             if (await _repository.ExistsAsync(request.IdentificationNumber))
             {
-                throw new BusinessException($"An insured with identification number {request.IdentificationNumber} already exists");
+                throw new ConflictException("insured", "identification number", request.IdentificationNumber);
             }
 
             // Validar email único
             if (await _repository.ExistsByEmailAsync(request.Email))
             {
-                throw new BusinessException($"An insured with email {request.Email} already exists");
+                throw new ConflictException("insured", "email", request.Email);
             }
 
             // Validar fecha de nacimiento
@@ -127,7 +127,7 @@ namespace SegurosAPI.Services.Implementations
             // Validar email único (excluyendo el actual)
             if (await _repository.ExistsByEmailAsync(request.Email, id))
             {
-                throw new BusinessException($"Another insured with email {request.Email} already exists");
+                throw new ConflictException("insured", "email", request.Email);
             }
 
             // Validar fecha de nacimiento
@@ -170,7 +170,7 @@ namespace SegurosAPI.Services.Implementations
         {
             if (birthDate > DateTime.Now)
             {
-                throw new BusinessException("Birth date cannot be a future date");
+                throw new ValidationException("Birth date cannot be a future date");
             }
 
             var age = DateTime.Now.Year - birthDate.Year;
@@ -178,7 +178,7 @@ namespace SegurosAPI.Services.Implementations
 
             if (age < 18)
             {
-                throw new BusinessException("Insured must be over 18 years old");
+                throw new ValidationException("Insured must be over 18 years old");
             }
         }
 
